@@ -11,7 +11,15 @@
  * prior written consent.
  */
 
-session_start();
-session_destroy();
-header("Location: /auth/login.php");
-exit;
+declare(strict_types=1);
+
+require_once __DIR__ . '/../../config/bootstrap.php';
+require_once APP_PATH . '/Auth/guard.php';
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    csrf_verify($_POST['_token'] ?? null);
+
+    session_destroy();
+    header("Location: /auth/login.php");
+    exit;
+}
