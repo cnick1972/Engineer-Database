@@ -18,7 +18,7 @@ $pass       = getenv('DB_PASS');
 
 
 /** @var array $CONFIG */
-$dsn = sprintf('mysql:host=%s;dbname=%s;charset=utf8mb4;port=$s', $host, $db, $port);
+$dsn = sprintf('mysql:host=%s;port=%s;dbname=%s;charset=utf8mb4', $host, $port, $db);
 $options = [
   PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
   PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
