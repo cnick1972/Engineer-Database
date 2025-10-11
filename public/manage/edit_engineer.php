@@ -37,8 +37,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $name = $_POST['name'];
     $licence_number = $_POST['licence_number'];
     $stmt = $pdo->prepare("UPDATE engineers SET name=:name, licence_number=:licence_number WHERE engineer_id=:id");
-    $stmt->execute(['name' => $name,'licence_number' => $licence_number,'id' => $engineer_id]);
-    echo '<div class="alert alert-success">Engineer updated successfully.</div>';
+    if($stmt->execute(['name' => $name,'licence_number' => $licence_number,'id' => $engineer_id])) {
+        header('Location: /engineers.php?msg=' . urlencode('Engineer updated successfully'));
+        exit;
+    }
+    else {
+        echo '<div class="alert alert-danger">Error updating engineer.</div>';
+    }
 }
 ?>
 

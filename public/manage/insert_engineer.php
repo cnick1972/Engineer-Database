@@ -23,7 +23,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $stmt = $pdo->prepare("INSERT INTO engineers (name, licence_number) VALUES (:name, :licence_number)");
     if ($stmt->execute(['name' => $name, 'licence_number' => $licence_number])) {
-        $message = '<div class="alert alert-success">Engineer added successfully.</div>';
+        header('Location: /engineers.php?msg=' . urlencode('Engineer added successfully'));
+        exit;
     } else {
         $message = '<div class="alert alert-danger">Error adding engineer.</div>';
     }

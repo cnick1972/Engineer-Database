@@ -24,7 +24,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $stmt = $pdo->prepare("INSERT INTO aircraft (tail_number, aircraft_type, engine_type) VALUES (:tail_number, :aircraft_type, :engine_type)");
     if ($stmt->execute(['tail_number' => $tail_number, 'aircraft_type' => $aircraft_type, 'engine_type' => $engine_type])) {
-        $message = '<div class="alert alert-success">Aircraft added successfully.</div>';
+        header('Location: /aircraft.php?msg=' . urlencode('Aircraft added successfully')); 
+        exit;
     } else {
         $message = '<div class="alert alert-danger">Error adding aircraft.</div>';
     }
