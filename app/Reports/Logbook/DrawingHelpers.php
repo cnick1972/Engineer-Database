@@ -17,71 +17,107 @@ use TCPDF;
 
 class DrawingHelpers
 {
-    public static function drawMergedGrid(TCPDF $pdf, float $x, float $y, float $rowH, array $colW, float $thin, float $thick): void
-    {
-        // grid: 6 columns, 6 rows
-        $rows = 6;
+    public static function drawMergedGrid(
+        TCPDF $pdf,
+        float $x,
+        float $y,
+        float $rowH,
+        array $colW,
+        float $thin,
+        float $thick,
+        array $fullColX = [] // NEW: 0-based column indexes to draw a big X across
+    ): void {
+        // grid geometry
+        $rows = 6;                        // as per your current layout
+        $colCount = count($colW);         // expected 6
 
         $pdf->SetLineWidth($thin);
 
-        // Column X positions: X[0]..X[6]
+        // Column edges X[0]..X[n]
         $X = [$x];
-        for ($i = 0; $i < 6; $i++) {
+        for ($i = 0; $i < $colCount; $i++) {
             $X[] = $X[$i] + $colW[$i];
         }
 
-        // Row Y positions: Y[0]..Y[6]
+        // Row edges Y[0]..Y[6]
         $Y = [$y];
         for ($r = 0; $r < $rows; $r++) {
             $Y[] = $Y[$r] + $rowH;
         }
 
-        // Vertical separators
-        for ($i = 1; $i <= 5; $i++) {
+        // --- Vertical lines (preserve your special cases) ---
+        // i === 3 : from Y0..Y5
+        // i === 4 : from Y1..Y5
+        // others  : full height
+        for ($i = 1; $i <= $colCount - 1; $i++) {
             if ($i === 4) {
-                // your original partial line
                 $pdf->Line($X[$i], $Y[1], $X[$i], $Y[5]);
             } elseif ($i === 3) {
                 $pdf->Line($X[$i], $Y[0], $X[$i], $Y[5]);
             } else {
-                // default full height (includes left border of merged col 6 at X[5])
                 $pdf->Line($X[$i], $Y[0], $X[$i], $Y[6]);
             }
         }
 
-        // Horizontal lines between rows
-        // Merge column 6 by NEVER drawing across X[5]..X[6]
+        // --- Horizontal lines (preserve merges rows 2..4; merge column 6 entirely) ---
         for ($r = 1; $r <= 5; $r++) {
             $yy = $Y[$r];
+            $stopBeforeLastCol = $X[$colCount - 1]; // X[5] when 6 cols
 
             if ($r >= 2 && $r <= 4) {
-                // preserve your existing gap across X[2]..X[3],
-                // and add a gap across X[5]..X[6] (merged col 6)
-                $pdf->Line($X[0], $yy, $X[2], $yy); // left block
-                $pdf->Line($X[3], $yy, $X[5], $yy); // up to col 6 (stop before X[5]..X[6])
+                // Your existing split around X[2]..X[3], and stop before last column band
+                $pdf->Line($X[0], $yy, $X[2], $yy);
+                $pdf->Line($X[3], $yy, $stopBeforeLastCol, $yy);
+                // Do NOT draw across last column (so col 6 is vertically merged)
             } else {
-                // full row line up to the start of merged col 6
-                $pdf->Line($X[0], $yy, $X[5], $yy);
+                // Single segment up to the start of the last column; skip X[last-1]..X[last]
+                $pdf->Line($X[0], $yy, $stopBeforeLastCol, $yy);
             }
         }
 
-        // Outer border
+        // --- Outer border ---
         $pdf->SetLineWidth($thick);
-        $pdf->Rect($X[0], $Y[0], $X[6] - $X[0], $Y[6] - $Y[0]);
+        $pdf->Rect($X[0], $Y[0], $X[$colCount] - $X[0], $Y[6] - $Y[0]);
+
+        // --- Full-column X overlays (if any) ---
+        if (!empty($fullColX)) {
+            $pdf->SetLineWidth($thin); // tweak if you want heavier X
+            $colTop = $Y[0];
+            $colH   = $Y[6] - $Y[0];
+            foreach ($fullColX as $ci) {
+                if (!isset($colW[$ci])) continue;
+                $colLeft = $X[$ci];
+                $colWdt  = $colW[$ci];
+                self::drawColumnX($pdf, $colLeft, $colTop, $colWdt, $colH, 1.5, null);
+            }
+        }
     }
 
 
-    public static function drawDiagonalThroughCells(TCPDF $pdf, float $x, float $y, float $rowH, array $colW, int $numRows = 6): void
-    {
+
+    public static function drawDiagonalThroughCells(TCPDF $pdf, float $x, float $y, float $rowH, array $colW, int $numRows = 6): void {
+        // Same look as before
         $pdf->SetLineWidth(0.3);
-        $pdf->SetDrawColor(120, 120, 120);
-        for ($r = 0; $r < $numRows; $r++) {
-            $yt = $y + $r * $rowH;
-            $yb = $yt + $rowH;
-            $pdf->Line($x, $yt, $x + $colW[0], $yb);
-            $pdf->Line($x + $colW[0], $yt, $x + $colW[0] + $colW[1], $yb);
-        }
         $pdf->SetDrawColor(0, 0, 0);
+
+        // Total height covered by the stacked rows
+        $h = $rowH * $numRows;
+
+        // Column 1: from its top-left to bottom-right
+        $pdf->Line(
+            $x,           // left edge of col 1
+            $y,           // top
+            $x + $colW[0],
+            $y + $h       // bottom
+        );
+
+        // Column 2: from its top-left to bottom-right
+        $pdf->Line(
+            $x + $colW[0],                 // left edge of col 2
+            $y,                            // top
+            $x + $colW[0] + $colW[1],
+            $y + $h                        // bottom
+        );
     }
 
     public static function drawCol1Labels(TCPDF $pdf, float $x, float $y, float $rowH, float $w, string $font, float $fs): void
@@ -90,6 +126,16 @@ class DrawingHelpers
         $pdf->SetFont($font, '', $fs);
         foreach ($labels as $i => $txt) {
             $pdf->MultiCell($w, $rowH, $txt, 0, 'C', false, 0, $x, $y + $i * $rowH, true, 0, false, true, $rowH, 'M');
+        }
+    }
+
+    
+    public static function drawCol4Labels(TCPDF $pdf, float $x, float $y, float $rowH, float $w, string $font, float $fs): void
+    {
+        $labels = ['CDCCL','EWIZ','EZAP','AWL'];
+        $pdf->SetFont($font, '', $fs);
+        foreach ($labels as $i => $txt) {
+            $pdf->MultiCell($w, $rowH, $txt, 0, 'C', false, 0, $x, $y + ($i + 1) * $rowH, true, 0, false, true, $rowH, 'M');
         }
     }
 
@@ -154,6 +200,25 @@ class DrawingHelpers
             $rowH,
             'M'
         );
+    }
+
+    public static function drawColumnX(
+        TCPDF $pdf,
+        float $x, float $y,         // top-left of the column
+        float $w, float $h,         // column width/height
+        float $pad = 1.5,           // inset so lines don't overlap borders
+        ?float $lineWidth = null    // null = keep current; else override temporarily
+    ): void {
+        $orig = $pdf->getLineWidth();
+        if ($lineWidth !== null) {
+            $pdf->SetLineWidth($lineWidth);
+        }
+        // Two diagonals across the column rect
+        $pdf->Line($x + $pad,       $y + $pad,       $x + $w - $pad, $y + $h - $pad);
+        $pdf->Line($x + $w - $pad,  $y + $pad,       $x + $pad,      $y + $h - $pad);
+        if ($lineWidth !== null) {
+            $pdf->SetLineWidth($orig);
+        }
     }
 
     public static function drawFooterOwner(TCPDF $pdf, string $font, float $fontSize = 12.0, string $ownerName = LOGBOOK_OWNER): void

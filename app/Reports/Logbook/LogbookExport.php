@@ -34,11 +34,11 @@ class LogbookExport
         $rows = $this->fetchTasks();
         if (!$rows) {
             $pdf->AddPage();
-            $pdf->SetFont('helvetica', '', 16);
+            $pdf->SetFont('calibri', '', 16);
             $pdf->SetXY(7, 7);
             $pdf->Cell(0, 8, 'Experience Logbook', 0, 1, 'L');
             $pdf->Ln(5);
-            $pdf->SetFont('helvetica', '', 12);
+            $pdf->SetFont('calibri', '', 11);
             $pdf->Cell(0, 8, 'No tasks found.', 0, 1, 'L');
             $pdf->Output('logbook_export_v2.pdf', 'I');
             return;
@@ -72,28 +72,30 @@ class LogbookExport
                         Layout::COL1_W, Layout::COL2_W, Layout::COL3_W, Layout::COL4_W, Layout::COL5_W,
                         max(0.0, ($pdf->getPageWidth() - 14) - (Layout::COL1_W + Layout::COL2_W + Layout::COL3_W + Layout::COL4_W + Layout::COL5_W))
                     ], $LW_THIN, $LW_THICK);
-
+                    DrawingHelpers::drawCol1Labels($pdf, 7, $y, Layout::ROW_HEIGHT, Layout::COL1_W, 'calibri', Layout::FONT_SIZE_NORMAL);
+                    DrawingHelpers::drawCol4Labels($pdf, Layout::COL4_START, $y, Layout::ROW_HEIGHT, Layout::COL1_W, 'calibri', Layout::FONT_SIZE_NORMAL);
+                    
                     if ($i === 0) {
-                        DrawingHelpers::drawCol1Labels($pdf, 7, $y, Layout::ROW_HEIGHT, Layout::COL1_W, 'helvetica', Layout::FONT_SIZE_NORMAL);
+                        
                         $date = date('d M y', strtotime($t['date_performed']));
-                        DrawingHelpers::drawTextInCol2Row($pdf, 7, $y, Layout::ROW_HEIGHT, Layout::COL1_W, Layout::COL2_W, 0, 'helvetica', 9, $date);
-                        DrawingHelpers::drawTextInCol2Row($pdf, 7, $y, Layout::ROW_HEIGHT, Layout::COL1_W, Layout::COL2_W, 1, 'helvetica', 9, $t['tail_number']);
+                        DrawingHelpers::drawTextInCol2Row($pdf, 7, $y, Layout::ROW_HEIGHT, Layout::COL1_W, Layout::COL2_W, 0, 'calibri', 11, $date);
+                        DrawingHelpers::drawTextInCol2Row($pdf, 7, $y, Layout::ROW_HEIGHT, Layout::COL1_W, Layout::COL2_W, 1, 'calibri', 11, $t['tail_number']);
 
                         $WO = trim((string)$t['WO_number']);
                         $check = trim((string)$t['check_pack_reference']);
                         $seq = trim((string)$t['task_card_seq']);
                         $l3 = ($WO !== '' && $WO !== '00000000') ? $WO : $check;
                         $l4 = ($WO !== '' && $WO !== '00000000') ? '' : $seq;
-                        DrawingHelpers::drawTextInCol2Row($pdf, 7, $y, Layout::ROW_HEIGHT, Layout::COL1_W, Layout::COL2_W, 2, 'helvetica', 9, $l3);
+                        DrawingHelpers::drawTextInCol2Row($pdf, 7, $y, Layout::ROW_HEIGHT, Layout::COL1_W, Layout::COL2_W, 2, 'calibri', 11, $l3);
                         if ($l4) {
-                            DrawingHelpers::drawTextInCol2Row($pdf, 7, $y, Layout::ROW_HEIGHT, Layout::COL1_W, Layout::COL2_W, 3, 'helvetica', 9, $l4);
+                            DrawingHelpers::drawTextInCol2Row($pdf, 7, $y, Layout::ROW_HEIGHT, Layout::COL1_W, Layout::COL2_W, 3, 'calibri', 11, $l4);
                         }
                     } else {
-                        DrawingHelpers::drawDiagonalThroughCells($pdf, 7, $y, Layout::ROW_HEIGHT, [Layout::COL1_W, Layout::COL2_W], 4);
+                        DrawingHelpers::drawDiagonalThroughCells($pdf, 7, $y, Layout::ROW_HEIGHT, [Layout::COL1_W, Layout::COL2_W], 6);
                     }
 
                     $cont = ($i > 0);
-                    DrawingHelpers::drawCol3Headings($pdf, 7, $y, Layout::ROW_HEIGHT, Layout::COL1_W, Layout::COL2_W, Layout::COL3_W, 'helvetica', 9, $chunk, $cont);
+                    DrawingHelpers::drawCol3Headings($pdf, 7, $y, Layout::ROW_HEIGHT, Layout::COL1_W, Layout::COL2_W, Layout::COL3_W, 'calibri', 11, $chunk, $cont);
                     DrawingHelpers::drawToolsUsedRow(
                         $pdf,
                         7,
@@ -102,8 +104,8 @@ class LogbookExport
                         Layout::COL1_W,
                         Layout::COL2_W,
                         Layout::COL3_W,
-                        'helvetica',
-                        9,
+                        'calibri',
+                        11,
                         $t['calibrated_tools'] ?? ''
                     );
 
@@ -143,12 +145,12 @@ class LogbookExport
     private function startGroupPage(TCPDF $pdf, array $meta): void
     {
         $pdf->AddPage();
-        DrawingHelpers::drawFooterOwner($pdf, 'helvetica', 12);
-        $pdf->SetFont('helvetica', '', 16);
+        DrawingHelpers::drawFooterOwner($pdf, 'calibri', 12);
+        $pdf->SetFont('calibri', '', 16);
         $pdf->SetXY(7, 7);
         $pdf->Cell(0, 8, 'Aircraft Maintenance Experience Logbook', 0, 1, 'L');
         $pdf->Ln(11 * 25.4 / 72.0);
-        $pdf->SetFont('helvetica', '', 11);
+        $pdf->SetFont('calibri', '', 11);
         $pdf->Cell(66, 5, 'Aircraft type: ' . $meta['ac'], 0, 0, 'L');
         $pdf->Cell(70, 5, 'Engine: ' . $meta['eng'], 0, 0, 'L');
         $pdf->Cell(0, 5, 'ATA Chapter: ' . $meta['ata'] . ' - ' . $meta['desc'], 0, 1, 'L');
@@ -157,7 +159,7 @@ class LogbookExport
 
     private function splitTask(TCPDF $pdf, string $text, float $boxW, float $boxH): array
     {
-        $pdf->SetFont('helvetica', '', 9);
+        $pdf->SetFont('calibri', '', 12);
         $words = preg_split('/\s+/u', trim($text));
         $chunks = [];
         $curr = '';

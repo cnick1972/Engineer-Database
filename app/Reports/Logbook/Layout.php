@@ -29,10 +29,18 @@ class Layout
     public const COL4_W = 18.0;
     public const COL5_W = 18.0;
 
+    public const COL4_START = 212.4;
+
     public const PAD_MM = 1.0;
 
     public const FONT_SIZE_NORMAL = 11;
     public const FONT_SIZE_TITLE  = 16;
 
     public const TABLES_PER_PAGE = 4;
+
+    // Which columns correspond to the three “tables” (0-based indexes)
+    public const COL_INDEX_CDCCL = 3; // adjust if different in your layout
+    public const COL_INDEX_EZAP  = 4; // adjust if different
+    public const COL_INDEX_EWIS  = 5; // adjust if different
+
 }
