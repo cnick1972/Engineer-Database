@@ -65,7 +65,10 @@ $active_menu = $active_map[$current_page] ?? '';
             <a class="nav-link" href="/auth/change_password.php">Change Password</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" href="/auth/logout.php">Logout</a>
+            <form class="nav-link" action="/auth/logout.php" method="post">
+              <?= csrf_field() ?>
+              <button type="submit" class="nav-link btn btn-link p-0">Logout</button>
+            </form>
         </li>
         <?php endif; ?>
       </ul>
