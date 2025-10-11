@@ -1,4 +1,15 @@
 <?php
+/**
+ * Maintenance Log Application
+ *
+ * Copyright (c) 2024 The Maintenance Log Developers.
+ * All rights reserved.
+ *
+ * This source code is proprietary and confidential. Unauthorized copying,
+ * modification, distribution, or disclosure is strictly prohibited without
+ * prior written consent.
+ */
+
 require_once __DIR__ . '/../../config/bootstrap.php';
 require_once APP_PATH . '/Auth/guard.php';   // omit on login/change_password pages
 include __DIR__ . '/../partials/header.php';

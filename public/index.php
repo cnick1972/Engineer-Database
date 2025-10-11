@@ -1,4 +1,14 @@
 <?php
+/**
+ * Maintenance Log Application
+ *
+ * Copyright (c) 2024 The Maintenance Log Developers.
+ * All rights reserved.
+ *
+ * This source code is proprietary and confidential. Unauthorized copying,
+ * modification, distribution, or disclosure is strictly prohibited without
+ * prior written consent.
+ */
 
 header('Location: /dashboard.php');
 exit;
