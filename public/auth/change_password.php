@@ -11,6 +11,7 @@
  */
 
 require_once __DIR__ . '/../../config/bootstrap.php';
+require_once APP_PATH . '/Auth/guard.php';
 // include __DIR__ . '/../partials/header.php';
 
 $message = '';

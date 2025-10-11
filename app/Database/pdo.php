@@ -10,11 +10,11 @@
  * prior written consent.
  */
 
-$host       = getenv('DB_HOST');
-$port       = getenv('DB_PORT');
-$db         = getenv('DB_NAME');
-$user       = getenv('DB_USER');
-$pass       = getenv('DB_PASS');
+$host       = getenv('DB_HOST') ?: '127.0.0.1';
+$port       = getenv('DB_PORT') ?: '3306';
+$db         = getenv('DB_NAME') ?: '';
+$user       = getenv('DB_USER') ?: '';
+$pass       = getenv('DB_PASS') ?: '';
 
 
 /** @var array $CONFIG */
