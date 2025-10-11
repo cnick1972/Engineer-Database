@@ -1,0 +1,4 @@
+# Set default page to dashboard.php
+DirectoryIndex dashboard.php index.php index.html
+
+

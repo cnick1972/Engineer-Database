@@ -1,0 +1,7 @@
+User-agent: *
+Disallow: /auth/
+Disallow: /manage/
+Allow: /
+
+# Prevent indexing of database tooling
+Disallow: /dbprobe.php
