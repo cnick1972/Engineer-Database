@@ -50,8 +50,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     else {
         echo '<div class="alert alert-danger">Error updating aircraft.</div>';
     }
-
-    echo '<div class="alert alert-success">Aircraft updated successfully.</div>';
 }
 ?>
 
