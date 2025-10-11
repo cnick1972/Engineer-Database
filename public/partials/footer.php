@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Maintenance Log Application
  *
@@ -9,6 +10,7 @@
  * modification, distribution, or disclosure is strictly prohibited without
  * prior written consent.
  */
+
 ?>
 </div> <!-- End container -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>

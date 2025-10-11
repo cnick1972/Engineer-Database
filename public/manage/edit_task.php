@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Maintenance Log Application
  *
@@ -54,7 +55,7 @@ $old = [
 ];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-  csrf_verify($_POST['_token'] ?? null);
+    csrf_verify($_POST['_token'] ?? null);
     if ($old['date_performed'] === '') {
         $errors[] = "Date is required.";
     }

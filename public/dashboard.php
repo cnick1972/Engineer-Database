@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Maintenance Log Application
  *
