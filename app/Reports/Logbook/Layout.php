@@ -42,5 +42,4 @@ class Layout
     public const COL_INDEX_CDCCL = 3; // adjust if different in your layout
     public const COL_INDEX_EZAP  = 4; // adjust if different
     public const COL_INDEX_EWIS  = 5; // adjust if different
-
 }

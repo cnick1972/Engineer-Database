@@ -74,9 +74,8 @@ class LogbookExport
                     ], $LW_THIN, $LW_THICK);
                     DrawingHelpers::drawCol1Labels($pdf, 7, $y, Layout::ROW_HEIGHT, Layout::COL1_W, 'calibri', Layout::FONT_SIZE_NORMAL);
                     DrawingHelpers::drawCol4Labels($pdf, Layout::COL4_START, $y, Layout::ROW_HEIGHT, Layout::COL1_W, 'calibri', Layout::FONT_SIZE_NORMAL);
-                    
+
                     if ($i === 0) {
-                        
                         $date = date('d M y', strtotime($t['date_performed']));
                         DrawingHelpers::drawTextInCol2Row($pdf, 7, $y, Layout::ROW_HEIGHT, Layout::COL1_W, Layout::COL2_W, 0, 'calibri', 11, $date);
                         DrawingHelpers::drawTextInCol2Row($pdf, 7, $y, Layout::ROW_HEIGHT, Layout::COL1_W, Layout::COL2_W, 1, 'calibri', 11, $t['tail_number']);

@@ -85,7 +85,9 @@ class DrawingHelpers
             $colTop = $Y[0];
             $colH   = $Y[6] - $Y[0];
             foreach ($fullColX as $ci) {
-                if (!isset($colW[$ci])) continue;
+                if (!isset($colW[$ci])) {
+                    continue;
+                }
                 $colLeft = $X[$ci];
                 $colWdt  = $colW[$ci];
                 self::drawColumnX($pdf, $colLeft, $colTop, $colWdt, $colH, 1.5, null);
@@ -95,7 +97,8 @@ class DrawingHelpers
 
 
 
-    public static function drawDiagonalThroughCells(TCPDF $pdf, float $x, float $y, float $rowH, array $colW, int $numRows = 6): void {
+    public static function drawDiagonalThroughCells(TCPDF $pdf, float $x, float $y, float $rowH, array $colW, int $numRows = 6): void
+    {
         // Same look as before
         $pdf->SetLineWidth(0.3);
         $pdf->SetDrawColor(0, 0, 0);
@@ -129,7 +132,6 @@ class DrawingHelpers
         }
     }
 
-    
     public static function drawCol4Labels(TCPDF $pdf, float $x, float $y, float $rowH, float $w, string $font, float $fs): void
     {
         $labels = ['CDCCL','EWIZ','EZAP','AWL'];
@@ -204,8 +206,10 @@ class DrawingHelpers
 
     public static function drawColumnX(
         TCPDF $pdf,
-        float $x, float $y,         // top-left of the column
-        float $w, float $h,         // column width/height
+        float $x,
+        float $y,         // top-left of the column
+        float $w,
+        float $h,         // column width/height
         float $pad = 1.5,           // inset so lines don't overlap borders
         ?float $lineWidth = null    // null = keep current; else override temporarily
     ): void {
@@ -214,8 +218,8 @@ class DrawingHelpers
             $pdf->SetLineWidth($lineWidth);
         }
         // Two diagonals across the column rect
-        $pdf->Line($x + $pad,       $y + $pad,       $x + $w - $pad, $y + $h - $pad);
-        $pdf->Line($x + $w - $pad,  $y + $pad,       $x + $pad,      $y + $h - $pad);
+        $pdf->Line($x + $pad, $y + $pad, $x + $w - $pad, $y + $h - $pad);
+        $pdf->Line($x + $w - $pad, $y + $pad, $x + $pad, $y + $h - $pad);
         if ($lineWidth !== null) {
             $pdf->SetLineWidth($orig);
         }
