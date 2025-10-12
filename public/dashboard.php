@@ -85,7 +85,7 @@ $pct = function ($n, $d) {
 
   <!-- Quick actions -->
   <div class="d-flex gap-2 flex-wrap mb-3">
-    <a class="btn btn-primary btn-sm" href="/reports/export_calendar.php">Export Calendar PDF</a>
+  <!--  <a class="btn btn-primary btn-sm" href="/reports/export_calendar.php">Export Calendar PDF</a> -->
     <a class="btn btn-info btn-sm" href="/reports/export_logbook.php">Export Logbook PDF</a>
   </div>
 
