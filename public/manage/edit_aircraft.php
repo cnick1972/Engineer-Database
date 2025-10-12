@@ -43,11 +43,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $engine_type = $_POST['engine_type'];
 
     $stmt = $pdo->prepare("UPDATE aircraft SET tail_number=:tail_number, aircraft_type=:aircraft_type, engine_type=:engine_type WHERE aircraft_id=:id");
-    if($stmt->execute(['tail_number' => $tail_number, 'aircraft_type' => $aircraft_type, 'engine_type' => $engine_type, 'id' => $aircraft_id])) {
+    if ($stmt->execute(['tail_number' => $tail_number, 'aircraft_type' => $aircraft_type, 'engine_type' => $engine_type, 'id' => $aircraft_id])) {
         header('Location: /aircraft.php?msg=' . urlencode('Aircraft updated successfully'));
         exit;
-    }
-    else {
+    } else {
         echo '<div class="alert alert-danger">Error updating aircraft.</div>';
     }
 }

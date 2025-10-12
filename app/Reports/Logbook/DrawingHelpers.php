@@ -309,6 +309,5 @@ class DrawingHelpers
         $pdf->MultiCell($w, $rowH, $txt2, 0, 'L', false, 0, $x, $y + ($i + 1) * $rowH, true, 0, false, true, $rowH, 'M');
         $pdf->SetFont($font, '', 6);
         $pdf->MultiCell($w, $rowH, $eng, 0, 'L', false, 0, $x, $y + ($i + 5) * $rowH, true, 0, false, true, $rowH, 'M');
-
     }
 }
