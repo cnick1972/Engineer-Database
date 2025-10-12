@@ -298,4 +298,17 @@ class DrawingHelpers
         $pdf->SetFont($font, '', $fs);
         $pdf->MultiCell($col2 - 2 * $pad, $rowH, $text, 0, 'L', false, 0, $x + $col1 + $pad, $y + $row * $rowH, true);
     }
+
+    public static function drawStampBlock(TCPDF $pdf, float $x, float $y, float $rowH, float $w, string $font, float $fs, string $eng = 'ABC'): void
+    {
+        $txt1 = 'Supervisors\'s Stamp &';
+        $txt2 = 'Signature:';
+        $pdf->SetFont($font, '', $fs);
+
+        $pdf->MultiCell($w, $rowH, $txt1, 0, 'L', false, 0, $x, $y + $i * $rowH, true, 0, false, true, $rowH, 'M');
+        $pdf->MultiCell($w, $rowH, $txt2, 0, 'L', false, 0, $x, $y + ($i + 1) * $rowH, true, 0, false, true, $rowH, 'M');
+        $pdf->SetFont($font, '', 6);
+        $pdf->MultiCell($w, $rowH, $eng, 0, 'L', false, 0, $x, $y + ($i + 5) * $rowH, true, 0, false, true, $rowH, 'M');
+
+    }
 }
