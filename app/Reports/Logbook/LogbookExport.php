@@ -74,7 +74,8 @@ class LogbookExport
                     ], $LW_THIN, $LW_THICK);
                     DrawingHelpers::drawCol1Labels($pdf, 7, $y, Layout::ROW_HEIGHT, Layout::COL1_W, 'calibri', Layout::FONT_SIZE_NORMAL);
                     DrawingHelpers::drawCol4Labels($pdf, Layout::COL4_START, $y, Layout::ROW_HEIGHT, Layout::COL1_W, 'calibri', Layout::FONT_SIZE_NORMAL);
-                    DrawingHelpers::drawStampBlock($pdf, 250, $y, Layout::ROW_HEIGHT, 40, 'calibri', Layout::FONT_SIZE_NORMAL, $t['engineer_name'] ?? '');
+                    $person = $t['engineer_name'] . ' ' . $t['licence_number'];
+                    DrawingHelpers::drawStampBlock($pdf, 250, $y, Layout::ROW_HEIGHT, 40, 'calibri', Layout::FONT_SIZE_NORMAL, $person);
 
                     if ($i === 0) {
                         $date = date('d M y', strtotime($t['date_performed']));
@@ -121,7 +122,7 @@ class LogbookExport
     private function fetchTasks(): array
     {
         $sql = "SELECT mt.*, a.aircraft_type, a.engine_type, a.tail_number,
-                       e.name AS engineer_name,
+                       e.licence_number, e.name AS engineer_name,
                        ata.ata_number, ata.description AS ata_desc
                 FROM maintenance_tasks mt
                 JOIN aircraft a ON mt.aircraft_id = a.aircraft_id
