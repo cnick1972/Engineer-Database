@@ -296,12 +296,12 @@ class DrawingHelpers
     ): void {
         $pad = Layout::PAD_MM;
         $pdf->SetFont($font, '', $fs);
-        $pdf->MultiCell($col2 - 2 * $pad, $rowH, $text, 0, 'L', false, 0, $x + $col1 + $pad, $y + $row * $rowH, true);
+        $pdf->MultiCell($col2 - 2 * $pad, $rowH, $text, 0, 'L', false, 0, $x + $col1 + $pad, $y + $row * $rowH, true, 0, false, true, 0, 'M', true);
     }
 
     public static function drawStampBlock(TCPDF $pdf, float $x, float $y, float $rowH, float $w, string $font, float $fs, string $eng = ''): void
     {
-        $txt = ['Supervisors\'s Stamp &', 'Signature:'];
+        $txt = ['Supervisor\'s Stamp &', 'Signature*'];
         $pdf->SetFont($font, '', $fs);
 
         foreach ($txt as $i => $label) {
