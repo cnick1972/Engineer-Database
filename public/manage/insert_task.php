@@ -70,15 +70,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (!$errors) {
         $sql = "INSERT INTO maintenance_tasks
-              (date_performed, aircraft_id, engineer_id, ata_id, task_description,
+              (user_id, date_performed, aircraft_id, engineer_id, ata_id, task_description,
                WO_number, task_card_seq, check_pack_reference,
                cdccl_task, ezap_task, ewis_task, reference, calibrated_tools)
             VALUES
-              (:date_performed, :aircraft_id, :engineer_id, :ata_id, :task_description,
+              (:user_id, :date_performed, :aircraft_id, :engineer_id, :ata_id, :task_description,
                :WO_number, :task_card_seq, :check_pack_reference,
                :cdccl_task, :ezap_task, :ewis_task, :reference, :calibrated_tools)";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
+        ':user_id'              => $_SESSION['user_id'],  
         ':date_performed'       => $old['date_performed'],
         ':aircraft_id'          => (int)$old['aircraft_id'],
         ':engineer_id'          => (int)$old['engineer_id'],

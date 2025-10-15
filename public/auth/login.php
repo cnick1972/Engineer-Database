@@ -24,6 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         session_regenerate_id(true);
         $_SESSION['logged_in'] = true;
         $_SESSION['username'] = $user['username'];
+        $_SESSION['user_id'] = $user['user_id'];
         header("Location: /dashboard.php");
         exit;
     } else {
