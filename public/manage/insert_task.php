@@ -21,6 +21,9 @@ include __DIR__ . '/../partials/header.php';
 $aircraft  = $pdo->query("SELECT aircraft_id, tail_number, aircraft_type, engine_type FROM aircraft ORDER BY tail_number")->fetchAll(PDO::FETCH_ASSOC);
 $engineers = $pdo->query("SELECT engineer_id, name FROM engineers ORDER BY name")->fetchAll(PDO::FETCH_ASSOC);
 $ata       = $pdo->query("SELECT ata_id, ata_number, description FROM ata ORDER BY CAST(ata_number AS UNSIGNED), ata_number")->fetchAll(PDO::FETCH_ASSOC);
+// Load available task types
+$types = $pdo->query('SELECT ID, tasks FROM task_types ORDER BY tasks')->fetchAll(PDO::FETCH_ASSOC);
+
 
 $errors = [];
 $old = [
@@ -38,6 +41,7 @@ $old = [
   'ezap_task'            => isset($_POST['ezap_task'])  ? '1' : '0',
   'ewis_task'            => isset($_POST['ewis_task'])  ? '1' : '0',
   'awl_task'             => isset($_POST['awl_task'])   ? '1' : '0',
+  'task_type'          => $_POST['task_type']          ?? '',
 ];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -69,15 +73,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors[] = "Check Pack Reference must be ≤ 24 characters.";
     }
 
+    $task_type = (int)($_POST['task_type'] ?? 0);
+        // Must choose a valid type (you said this will become NOT NULL)
+    if ($task_type <= 0) {
+        $errors[] = 'Please choose a task type.';
+    } else {
+        $chk = $pdo->prepare('SELECT 1 FROM task_types WHERE ID = :id');
+        $chk->execute([':id' => $task_type]);
+        if (!$chk->fetchColumn()) {
+            $errors[] = "Selected task type is not valid.";
+        }
+    }
+
+
+
     if (!$errors) {
         $sql = "INSERT INTO maintenance_tasks
               (user_id, date_performed, aircraft_id, engineer_id, ata_id, task_description,
                WO_number, task_card_seq, check_pack_reference,
-               cdccl_task, ezap_task, ewis_task, awl_task, reference, calibrated_tools)
+               cdccl_task, ezap_task, ewis_task, awl_task, reference, calibrated_tools,
+               task_type)
             VALUES
               (:user_id, :date_performed, :aircraft_id, :engineer_id, :ata_id, :task_description,
                :WO_number, :task_card_seq, :check_pack_reference,
-               :cdccl_task, :ezap_task, :ewis_task, :awl_task, :reference, :calibrated_tools)";
+               :cdccl_task, :ezap_task, :ewis_task, :awl_task, :reference, :calibrated_tools,
+               :task_type)";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
         ':user_id'              => $_SESSION['user_id'],  
@@ -95,6 +115,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ':awl_task'             => (int)$old['awl_task'],
         ':reference'            => $old['reference'],
         ':calibrated_tools'     => $old['calibrated_tools'],
+        ':task_type'            => $task_type,
         ]);
         header("Location: /tasks.php?msg=" . urlencode("Task added successfully"));
         exit;
@@ -191,6 +212,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <input class="form-check-input" type="checkbox" name="awl_task" id="awl_task" value="1" <?= $old['awl_task'] == '1' ? 'checked' : '' ?>>
         <label class="form-check-label" for="awl_task">AWL</label>
       </div>
+    </div>
+
+    <div class="col-mb-3">
+      <label class="form-label">Task Type</label>
+      <select name="task_type" class="form-select" required>
+        <option value="">— Select task type —</option>
+        <?php foreach ($types as $t): ?>
+          <option value="<?= (int)$t['ID'] ?>"
+            <?= ((string)$old['task_type'] === (string)$t['ID']) ? 'selected' : '' ?>>
+            <?= htmlspecialchars($t['tasks']) ?>
+          </option>
+        <?php endforeach; ?>
+      </select>
     </div>
 
     <div class="col-md-6">

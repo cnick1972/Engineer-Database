@@ -27,9 +27,13 @@ if ($task_id <= 0) {
 $aircraft  = $pdo->query("SELECT aircraft_id, tail_number, aircraft_type, engine_type FROM aircraft ORDER BY tail_number")->fetchAll(PDO::FETCH_ASSOC);
 $engineers = $pdo->query("SELECT engineer_id, name FROM engineers ORDER BY name")->fetchAll(PDO::FETCH_ASSOC);
 $ata       = $pdo->query("SELECT ata_id, ata_number, description FROM ata ORDER BY CAST(ata_number AS UNSIGNED), ata_number")->fetchAll(PDO::FETCH_ASSOC);
+$types     = $pdo->query('SELECT ID, tasks FROM task_types ORDER BY tasks')->fetchAll(PDO::FETCH_ASSOC);
 
 // Load task
 $stmt = $pdo->prepare("SELECT * FROM maintenance_tasks WHERE task_id = :id");
+
+
+
 $stmt->execute([':id' => $task_id]);
 $task = $stmt->fetch(PDO::FETCH_ASSOC);
 if (!$task) {
@@ -53,6 +57,7 @@ $old = [
   'ezap_task'            => isset($_POST['ezap_task'])  ? '1' : (string)($task['ezap_task'] ?? '0'),
   'ewis_task'            => isset($_POST['ewis_task'])  ? '1' : (string)($task['ewis_task'] ?? '0'),
   'awl_task'             => isset($_POST['awl_task'])  ? '1' : (string)($task['awl_task'] ?? '0'),
+  'task_type'            => $_POST['task_type']            ?? ($task['task_type'] ?? ''),
 ];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -82,6 +87,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors[] = "Check Pack Reference must be ≤ 24 characters.";
     }
 
+    $task_type = (int)($_POST['task_type'] ?? 0);
+    if ($task_type <= 0) {
+        $errors[] = 'Please choose a task type.';
+    } else {
+        $chk = $pdo->prepare('SELECT 1 FROM task_types WHERE ID = :id');
+        $chk->execute([':id' => $task_type]);
+        if (!$chk->fetchColumn()) {
+            $errors[] = 'Selected task type is not valid.';
+        }
+    }
+
     if (!$errors) {
         $sql = "UPDATE maintenance_tasks SET
               date_performed = :date_performed,
@@ -97,7 +113,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
               ewis_task = :ewis_task,
               awl_task = :awl_task,
               reference = :reference,
-              calibrated_tools = :calibrated_tools
+              calibrated_tools = :calibrated_tools,
+              task_type = :task_type
             WHERE task_id = :task_id";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
@@ -115,6 +132,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ':awl_task'             => (int)$old['awl_task'],
         ':reference'            => $old['reference'],
         ':calibrated_tools'     => $old['calibrated_tools'],
+        ':task_type'            => $task_type,
         ':task_id'              => $task_id,
         ]);
 
@@ -170,6 +188,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <?php foreach ($ata as $ch) : ?>
           <option value="<?= $ch['ata_id'] ?>" <?= (string)$old['ata_id'] === (string)$ch['ata_id'] ? 'selected' : '' ?>>
             <?= htmlspecialchars($ch['ata_number'] . ' - ' . $ch['description']) ?>
+          </option>
+        <?php endforeach; ?>
+      </select>
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label">Task Type</label>
+      <select name="task_type" class="form-select" required>
+        <option value="">— Select task type —</option>
+        <?php foreach ($types as $t): ?>
+          <option value="<?= (int)$t['ID'] ?>"
+            <?= ((string)$old['task_type'] === (string)$t['ID']) ? 'selected' : '' ?>>
+            <?= htmlspecialchars($t['tasks']) ?>
           </option>
         <?php endforeach; ?>
       </select>

@@ -23,33 +23,32 @@ try {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
-        csrf_verify($_POST['_token'] ?? null);
+        // Only verify CSRF if your project has it wired
+        if (function_exists('csrf_verify')) {
+            csrf_verify($_POST['_token'] ?? null);
+        }
 
         $submitted = $_POST['task_type'] ?? [];
         if (!is_array($submitted)) $submitted = [];
 
         $pdo->beginTransaction();
 
-        $chkType = $pdo->prepare('SELECT 1 FROM task_types WHERE ID = :id');                // validates selected type exists
-        $upd     = $pdo->prepare('UPDATE maintenance_tasks
-                                  SET task_type = :tid
-                                  WHERE task_id = :id
-                                    AND (task_type IS NULL OR task_type <> :tid)');
+        $chkType = $pdo->prepare('SELECT 1 FROM task_types WHERE ID = :id');
+        $upd = $pdo->prepare('UPDATE maintenance_tasks
+                      SET task_type = :tid_set
+                      WHERE task_id = :id
+                        AND (task_type IS NULL OR task_type <> :tid_cmp)');
 
         $updated = 0;
         foreach ($submitted as $taskIdStr => $tidStr) {
             $taskId = (int)$taskIdStr;
             $tid    = (int)$tidStr;
-            if ($taskId <= 0 || $tid <= 0) {
-                continue; // ignore empties/invalids
-            }
+            if ($taskId <= 0 || $tid <= 0) continue;
 
             $chkType->execute([':id' => $tid]);
-            if (!$chkType->fetchColumn()) {
-                continue; // ignore bad IDs (FK will protect anyway)
-            }
+            if (!$chkType->fetchColumn()) continue;
 
-            $upd->execute([':tid' => $tid, ':id' => $taskId]);
+            $upd->execute(['tid_set' => $tid, 'tid_cmp' => $tid, 'id' => $taskId]);
             $updated += $upd->rowCount();
         }
 
@@ -57,7 +56,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $flash = $updated > 0 ? "Updated {$updated} task(s)." : "No changes detected.";
     } catch (Throwable $e) {
         if ($pdo->inTransaction()) $pdo->rollBack();
-        $errors[] = 'Save failed.';
+
+        // Temporary: show the real reason so you can fix it
+        $errors[] = 'Save failed: ' . $e->getMessage();
+        error_log('[set_task_types] ' . $e);
     }
 }
 
