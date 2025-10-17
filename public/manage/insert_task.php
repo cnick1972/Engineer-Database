@@ -37,6 +37,7 @@ $old = [
   'cdccl_task'           => isset($_POST['cdccl_task']) ? '1' : '0',
   'ezap_task'            => isset($_POST['ezap_task'])  ? '1' : '0',
   'ewis_task'            => isset($_POST['ewis_task'])  ? '1' : '0',
+  'awl_task'             => isset($_POST['awl_task'])   ? '1' : '0',
 ];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -72,11 +73,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $sql = "INSERT INTO maintenance_tasks
               (user_id, date_performed, aircraft_id, engineer_id, ata_id, task_description,
                WO_number, task_card_seq, check_pack_reference,
-               cdccl_task, ezap_task, ewis_task, reference, calibrated_tools)
+               cdccl_task, ezap_task, ewis_task, awl_task, reference, calibrated_tools)
             VALUES
               (:user_id, :date_performed, :aircraft_id, :engineer_id, :ata_id, :task_description,
                :WO_number, :task_card_seq, :check_pack_reference,
-               :cdccl_task, :ezap_task, :ewis_task, :reference, :calibrated_tools)";
+               :cdccl_task, :ezap_task, :ewis_task, :awl_task, :reference, :calibrated_tools)";
         $stmt = $pdo->prepare($sql);
         $stmt->execute([
         ':user_id'              => $_SESSION['user_id'],  
@@ -91,6 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ':cdccl_task'           => (int)$old['cdccl_task'],
         ':ezap_task'            => (int)$old['ezap_task'],
         ':ewis_task'            => (int)$old['ewis_task'],
+        ':awl_task'             => (int)$old['awl_task'],
         ':reference'            => $old['reference'],
         ':calibrated_tools'     => $old['calibrated_tools'],
         ]);
@@ -184,6 +186,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <div class="form-check">
         <input class="form-check-input" type="checkbox" name="ewis_task" id="ewis_task" value="1" <?= $old['ewis_task'] == '1' ? 'checked' : '' ?>>
         <label class="form-check-label" for="ewis_task">EWIS</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="awl_task" id="awl_task" value="1" <?= $old['awl_task'] == '1' ? 'checked' : '' ?>>
+        <label class="form-check-label" for="awl_task">AWL</label>
       </div>
     </div>
 

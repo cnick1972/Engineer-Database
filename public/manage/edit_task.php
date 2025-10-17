@@ -52,6 +52,7 @@ $old = [
   'cdccl_task'           => isset($_POST['cdccl_task']) ? '1' : (string)($task['cdccl_task'] ?? '0'),
   'ezap_task'            => isset($_POST['ezap_task'])  ? '1' : (string)($task['ezap_task'] ?? '0'),
   'ewis_task'            => isset($_POST['ewis_task'])  ? '1' : (string)($task['ewis_task'] ?? '0'),
+  'awl_task'             => isset($_POST['awl_task'])  ? '1' : (string)($task['awl_task'] ?? '0'),
 ];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -94,6 +95,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
               cdccl_task = :cdccl_task,
               ezap_task = :ezap_task,
               ewis_task = :ewis_task,
+              awl_task = :awl_task,
               reference = :reference,
               calibrated_tools = :calibrated_tools
             WHERE task_id = :task_id";
@@ -110,6 +112,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         ':cdccl_task'           => (int)$old['cdccl_task'],
         ':ezap_task'            => (int)$old['ezap_task'],
         ':ewis_task'            => (int)$old['ewis_task'],
+        ':awl_task'             => (int)$old['awl_task'],
         ':reference'            => $old['reference'],
         ':calibrated_tools'     => $old['calibrated_tools'],
         ':task_id'              => $task_id,
@@ -207,6 +210,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       <div class="form-check">
         <input class="form-check-input" type="checkbox" name="ewis_task" id="ewis_task" value="1" <?= $old['ewis_task'] == '1' ? 'checked' : '' ?>>
         <label class="form-check-label" for="ewis_task">EWIS</label>
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="awl_task" id="awl_task" value="1" <?= $old['awl_task'] == '1' ? 'checked' : '' ?>>
+        <label class="form-check-label" for="awl_task">AWL</label>
       </div>
     </div>
 

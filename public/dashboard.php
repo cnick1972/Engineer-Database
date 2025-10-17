@@ -59,7 +59,8 @@ $summary = $pdo->query("
       COUNT(*) AS total_tasks,
       SUM(CASE WHEN cdccl_task=1 THEN 1 ELSE 0 END) AS cdccl,
       SUM(CASE WHEN ewis_task=1   THEN 1 ELSE 0 END) AS ewis,
-      SUM(CASE WHEN ezap_task=1   THEN 1 ELSE 0 END) AS ezap
+      SUM(CASE WHEN ezap_task=1   THEN 1 ELSE 0 END) AS ezap,
+      SUM(CASE WHEN awl_task=1   THEN 1 ELSE 0 END) AS awl
     FROM maintenance_tasks
 ")->fetch(PDO::FETCH_ASSOC);
 
@@ -67,6 +68,7 @@ $totalTasks = (int)($summary['total_tasks'] ?? 0);
 $totCDCCL   = (int)($summary['cdccl'] ?? 0);
 $totEWIS    = (int)($summary['ewis'] ?? 0);
 $totEZAP    = (int)($summary['ezap'] ?? 0);
+$totAWL     = (int)($summary['awl'] ?? 0);
 $pct = function ($n, $d) {
     return $d > 0 ? round(($n / $d) * 100) : 0;
 };
@@ -178,13 +180,22 @@ $pct = function ($n, $d) {
               <div class="progress-bar bg-warning" style="width:<?= $pct($totEWIS, $totalTasks) ?>%"></div>
             </div>
           </div>
-          <div>
+          <div class="mb-3">
             <div class="d-flex justify-content-between">
               <span>EZAP</span>
               <span class="badge bg-success"><?= number_format($totEZAP) ?> (<?= $pct($totEZAP, $totalTasks) ?>%)</span>
             </div>
             <div class="progress mt-1" style="height:8px;">
               <div class="progress-bar bg-success" style="width:<?= $pct($totEZAP, $totalTasks) ?>%"></div>
+            </div>
+          </div>
+          <div>
+            <div class="d-flex justify-content-between">
+              <span>AWL</span>
+              <span class="badge bg-success"><?= number_format($totAWL) ?> (<?= $pct($totAWL, $totalTasks) ?>%)</span>
+            </div>
+            <div class="progress mt-1" style="height:8px;">
+              <div class="progress-bar bg-success" style="width:<?= $pct($totAWL, $totalTasks) ?>%"></div>
             </div>
           </div>
           <hr>
