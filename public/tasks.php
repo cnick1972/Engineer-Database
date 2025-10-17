@@ -21,6 +21,7 @@ include __DIR__ . '/partials/header.php';
 $aircraft  = $pdo->query("SELECT aircraft_id, tail_number FROM aircraft ORDER BY tail_number")->fetchAll(PDO::FETCH_ASSOC);
 $engineers = $pdo->query("SELECT engineer_id, name FROM engineers ORDER BY name")->fetchAll(PDO::FETCH_ASSOC);
 $ata       = $pdo->query("SELECT ata_id, ata_number, description FROM ata ORDER BY CAST(ata_number AS UNSIGNED), ata_number")->fetchAll(PDO::FETCH_ASSOC);
+$types = $pdo->query("SELECT ID, tasks FROM task_types ORDER BY tasks")->fetchAll(PDO::FETCH_ASSOC);
 
 $params = [];
 $where = [];
@@ -47,6 +48,11 @@ if (!empty($_GET['date_to'])) {
     $params['date_to'] = $_GET['date_to'];
 }
 
+if (!empty($_GET['task_type'])) {
+    $where[] = 'mt.task_type = :task_type';
+    $params[':task_type'] = (int)$_GET['task_type'];
+}
+
 $whereSQL = $where ? 'WHERE ' . implode(' AND ', $where) : '';
 
 $sql = "
@@ -62,11 +68,13 @@ $sql = "
         e.name AS engineer_name,
         e.licence_number,
         ata.ata_number,
-        ata.description AS ata_desc
+        ata.description AS ata_desc,
+        tt.tasks AS task_type_name
     FROM maintenance_tasks mt
     JOIN aircraft a ON mt.aircraft_id = a.aircraft_id
     JOIN engineers e ON mt.engineer_id = e.engineer_id
     JOIN ata ON mt.ata_id = ata.ata_id
+    LEFT JOIN task_types tt ON tt.ID = mt.task_type
     $whereSQL
     ORDER BY mt.date_performed DESC, mt.task_id DESC
 ";
@@ -130,6 +138,18 @@ $flashErr = isset($_GET['err']) ? trim((string)$_GET['err']) : '';
           </select>
         </div>
 
+        <div class="col-md-3">
+          <label class="form-label">Task Type</label>
+          <select name="task_type" class="form-select">
+            <option value="">All</option>
+            <?php foreach ($types as $t): ?>
+              <option value="<?= (int)$t['ID'] ?>" <?= (($_GET['task_type'] ?? '') == (string)$t['ID']) ? 'selected' : '' ?>>
+                <?= htmlspecialchars($t['tasks']) ?>
+              </option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+
         <div class="col-md-2">
           <label class="form-label">Date From</label>
           <input type="date" class="form-control" name="date_from" value="<?= htmlspecialchars($_GET['date_from'] ?? '') ?>">
@@ -157,6 +177,7 @@ $flashErr = isset($_GET['err']) ? trim((string)$_GET['err']) : '';
             <th>W/O Number</th> <!-- NEW -->
             <th>Aircraft</th>
             <th>ATA</th>
+            <th>Task Type</th>
             <th>Task Description</th>
             <th>Engineer</th>
             <th>Actions</th>
@@ -170,6 +191,7 @@ $flashErr = isset($_GET['err']) ? trim((string)$_GET['err']) : '';
                 <td><?= htmlspecialchars($t['WO_number'] ?? '-') ?></td>
                 <td><?= htmlspecialchars($t['tail_number'] . ' (' . $t['aircraft_type'] . ')') ?></td>
                 <td><?= htmlspecialchars($t['ata_number']) ?> - <?= htmlspecialchars($t['ata_desc']) ?></td>
+                <td><?= htmlspecialchars($t['task_type_name'] ?? '—') ?></td>
                 <td><?= nl2br(htmlspecialchars($t['task_description'])) ?></td>
                 <td><?= htmlspecialchars($t['engineer_name']) ?> (<?= htmlspecialchars($t['licence_number']) ?>)</td>
                 <td>
