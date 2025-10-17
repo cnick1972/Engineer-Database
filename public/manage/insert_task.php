@@ -63,7 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
   // Adjust length if your schema defines a different size for WO_number
-    if (mb_strlen($old['WO_number']) > 20) {
+    if (mb_strlen($old['WO_number']) > 64) {
         $errors[] = "W/O Number must be ≤ 20 characters.";
     }
     if (mb_strlen($old['task_card_seq']) > 5) {

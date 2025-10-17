@@ -77,7 +77,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (trim($old['task_description']) === '') {
         $errors[] = "Task description is required.";
     }
-    if (mb_strlen($old['WO_number']) > 20) {
+    if (mb_strlen($old['WO_number']) > 64) {
         $errors[] = "W/O Number must be ≤ 20 characters.";
     }
     if (mb_strlen($old['task_card_seq']) > 5) {
